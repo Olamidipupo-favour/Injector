@@ -51,12 +51,10 @@ BYTE* Injector::GetModuleBaseAddress(HANDLE Process, const std::wstring& Path) {
 	DWORD SizeNeeded = 0;
 	do
 	{
-		Modules.reserve(SizeNeeded / sizeof(HMODULE));
-		if (!EnumProcessModules(Process, Modules.data(), Modules.capacity() * sizeof(HMODULE), &SizeNeeded))
+		Modules.resize(SizeNeeded / sizeof(HMODULE));
+		if (!EnumProcessModules(Process, Modules.data(), Modules.size() * sizeof(HMODULE), &SizeNeeded))
 			throw std::runtime_error("Could not get module snapshot for remote process.");
-	} while (SizeNeeded > Modules.capacity() * sizeof(HMODULE));
-	// Make capacity into size
-	Modules = std::vector<HMODULE>(Modules.begin(), Modules.begin() + SizeNeeded / sizeof(HMODULE));
+	} while (SizeNeeded > Modules.size() * sizeof(HMODULE));
 
 	// Get the HMODULE of the desired library
 	bool Found = false;
